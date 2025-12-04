@@ -1,0 +1,378 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8" />
+  <title>Барабан заданий</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+  <!-- Новый красивый шрифт для всего сайта -->
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat+Alternates:wght@300;400;600;700;800&display=swap" rel="stylesheet">
+
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      font-family: "Montserrat Alternates", sans-serif;
+    }
+
+    body {
+      min-height: 100vh;
+      background: #000;
+      color: #fff;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+
+    /* ---------- Заголовок ---------- */
+    h1 {
+      text-align: center;
+      color: #B8DB00;
+      font-size: 42px;
+      margin-top: 40px;
+      margin-bottom: 25px;
+      letter-spacing: 2px;
+      font-weight: 800;
+    }
+
+    /* ---------- Основная доска ---------- */
+    .board {
+      display: flex;
+      justify-content: center;
+      align-items: center;     /* центр по высоте */
+      gap: 60px;
+      margin-top: 20px;
+      flex-wrap: wrap;
+    }
+
+    /* ---------- Правая колонка ---------- */
+    .right-block {
+      display: flex;
+      flex-direction: column;
+      justify-content: center; /* выравниваем по центру барабана */
+      align-items: center;
+      gap: 20px;
+      transform: translateY(40px);  /* чуть ниже центра барабана */
+      max-width: 380px;
+    }
+
+    /* ---------- Барабан ---------- */
+    .wheel-wrapper {
+      position: relative;
+      width: 350px;
+      height: 350px;
+    }
+
+    .wheel {
+      width: 100%;
+      height: 100%;
+      border-radius: 50%;
+      border: 5px solid #1a1a1a;
+      background: conic-gradient(
+        #B8DB00 0deg 36deg,
+        #1a1a1a 36deg 72deg,
+        #B8DB00 72deg 108deg,
+        #1a1a1a 108deg 144deg,
+        #B8DB00 144deg 180deg,
+        #1a1a1a 180deg 216deg,
+        #B8DB00 216deg 252deg,
+        #1a1a1a 252deg 288deg,
+        #B8DB00 288deg 324deg,
+        #1a1a1a 324deg 360deg
+      );
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: transform 4s cubic-bezier(.17,.67,.32,1.36);
+      box-shadow: 0 0 35px #B8DB00;
+      z-index: 1;
+    }
+
+    /* ---------- Логотип BRITVA в центре ---------- */
+    .wheel-center {
+      width: 140px;
+      height: 140px;
+      background: #000;
+      border-radius: 50%;
+      border: 3px solid #B8DB00;
+      color: white;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-direction: column;
+      font-weight: 900;
+      font-size: 22px;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+    }
+
+    .wheel-center small {
+      font-size: 10px;
+      letter-spacing: 3px;
+    }
+
+    /* фиксируем шрифт для логотипа, чтобы не менялся */
+    .wheel-center,
+    .wheel-center * {
+      font-family: "Montserrat", sans-serif !important;
+      font-weight: 900 !important;
+      letter-spacing: 2px !important;
+    }
+
+    /* ---------- Красный указатель (смотрит вниз) ---------- */
+    .pointer {
+      position: absolute;
+      top: -5px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 0;
+      height: 0;
+      border-left: 20px solid transparent;
+      border-right: 20px solid transparent;
+      border-top: 36px solid #ff3b3b;
+      filter: drop-shadow(0 0 12px rgba(255,0,0,0.9));
+      z-index: 999;
+    }
+
+    /* ---------- Рамка задания ---------- */
+    .task-box {
+      width: 100%;
+      background: #0e0e0e;
+      border: 2px solid #B8DB00;
+      border-radius: 18px;
+      padding: 20px;
+      text-align: left;
+      box-shadow: 0 0 20px rgba(184,219,0,0.3);
+    }
+
+    .task-label {
+      font-size: 14px;
+      opacity: 0.7;
+      letter-spacing: 1px;
+      margin-bottom: 10px;
+      text-transform: uppercase;
+    }
+
+    .task-text {
+      font-size: 20px;
+      line-height: 1.4;
+      margin-bottom: 5px;
+    }
+
+    /* ---------- Кнопка ---------- */
+    .btn {
+      padding: 14px 36px;
+      border-radius: 40px;
+      border: none;
+      background: #B8DB00;
+      color: #000;
+      font-weight: 700;
+      font-size: 18px;
+      cursor: pointer;
+      letter-spacing: 1px;
+      box-shadow: 0 0 12px #B8DB00;
+      transition: 0.2s;
+    }
+
+    .btn:active {
+      transform: scale(0.95);
+      box-shadow: 0 0 6px #B8DB00;
+    }
+
+    /* ---------- Блок добавления заданий ---------- */
+    .add-box {
+      width: 100%;
+      background: #050505;
+      border-radius: 16px;
+      border: 1px solid #333;
+      padding: 14px 16px;
+      margin-top: 10px;
+      font-size: 14px;
+    }
+
+    .add-label {
+      opacity: 0.7;
+      margin-bottom: 6px;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      font-size: 12px;
+    }
+
+    .add-textarea {
+      width: 100%;
+      min-height: 60px;
+      background: #111;
+      border-radius: 10px;
+      border: 1px solid #444;
+      color: #fff;
+      padding: 8px 10px;
+      resize: vertical;
+      font-size: 14px;
+      margin-bottom: 8px;
+    }
+
+    .add-info {
+      opacity: 0.5;
+      font-size: 12px;
+      margin-bottom: 6px;
+    }
+
+    .btn-add {
+      padding: 8px 18px;
+      border-radius: 999px;
+      border: 1px solid #B8DB00;
+      background: transparent;
+      color: #B8DB00;
+      font-size: 13px;
+      font-weight: 600;
+      cursor: pointer;
+      letter-spacing: 1px;
+      text-transform: uppercase;
+    }
+
+    .btn-add:active {
+      transform: scale(0.97);
+    }
+
+    @media (max-width: 768px) {
+      .board {
+        gap: 30px;
+      }
+      .right-block {
+        transform: translateY(0);
+      }
+      .wheel-wrapper {
+        width: 280px;
+        height: 280px;
+      }
+    }
+  </style>
+</head>
+
+<body>
+
+  <h1>Барабан заданий</h1>
+
+  <div class="board">
+
+    <!-- БАРАБАН -->
+    <div class="wheel-wrapper">
+      <div class="pointer"></div>
+
+      <div class="wheel" id="wheel">
+        <div class="wheel-center">
+          BRITVA
+          <small>BARBERSHOP</small>
+        </div>
+      </div>
+    </div>
+
+    <!-- ПРАВАЯ ЧАСТЬ: рамка, кнопка, добавление заданий -->
+    <div class="right-block">
+
+      <div class="task-box">
+        <div class="task-label">Выпавшее задание:</div>
+        <div class="task-text" id="taskText">Нажми кнопку «Крутить»</div>
+      </div>
+
+      <button class="btn" id="spinBtn">КРУТИТЬ</button>
+
+      <div class="add-box">
+        <div class="add-label">Добавить задание в реальном времени</div>
+        <div class="add-info">Напиши задание, нажми «Добавить» — оно сразу попадёт в барабан</div>
+        <textarea class="add-textarea" id="newTask" placeholder="Например: «Сказать тост голосом диктора»"></textarea>
+        <button class="btn-add" id="addTaskBtn">Добавить задание</button>
+      </div>
+
+    </div>
+
+  </div>
+
+  <script>
+    const defaultTasks = [
+      "Показать жестами идеальную стрижку BRITVA.",
+      "Сказать тост в стиле барбера.",
+      "Изобразить, как спешит барбер на работу.",
+      "Придумать фирменный слоган BRITVA.",
+      "Сделать комплимент человеку справа.",
+      "Показать свою лучшую «барбер-позу».",
+      "Сыграть мини-сценку «клиент и барбер».",
+      "Произнести «Стрижём и бреем!» как боевой клич.",
+      "Изобразить танцующие ножницы.",
+      "Назвать три вещи, которые делает барбер лучше всех.",
+      "Встать всем натуралам.",
+      "Изобразить «барбера мечты», который стрижёт даже во сне.",
+      "Показать свою «модельную походку», будто только что вышел(а) из BRITVA.",
+      "Сказать три комплимента соседу слева, каждый — всё пафоснее.",
+      "Станцевать «танец счастья», будто стрижка досталась бесплатно.",
+      "Изобразить мимикой «до стрижки», «после стрижки» и «после комплимента от барбера».",
+      "Показать, как машиниста метро удивило количество BRITVA на зелёной ветке.",
+      "Сказать «SODA BEAUTY» сначала очень сексуально, потом как робот.",
+      "Изобразить человека, который увидел цену, удивился, а потом понял, что оно того стоит.",
+      "Объяснить иностранцу слово «борода» без слов."
+    ];
+
+    const wheel = document.getElementById("wheel");
+    const taskText = document.getElementById("taskText");
+    const spinBtn = document.getElementById("spinBtn");
+    const newTaskInput = document.getElementById("newTask");
+    const addTaskBtn = document.getElementById("addTaskBtn");
+
+    // Грузим задания из localStorage, если есть
+    let tasks;
+    const saved = localStorage.getItem("britva_tasks");
+    if (saved) {
+      try {
+        const parsed = JSON.parse(saved);
+        if (Array.isArray(parsed) && parsed.length > 0) {
+          tasks = parsed;
+        } else {
+          tasks = [...defaultTasks];
+        }
+      } catch {
+        tasks = [...defaultTasks];
+      }
+    } else {
+      tasks = [...defaultTasks];
+    }
+
+    let spinning = false;
+    let currentRotation = 0;
+
+    function spinWheel() {
+      if (spinning || tasks.length === 0) return;
+      spinning = true;
+      spinBtn.disabled = true;
+
+      const seg = 360 / tasks.length;
+      const index = Math.floor(Math.random() * tasks.length);
+      const extra = Math.random() * (seg * 0.6) - seg * 0.3;
+
+      const target = 360 * 6 + (index * seg) - 90 + extra;
+      currentRotation += target;
+      wheel.style.transform = `rotate(${currentRotation}deg)`;
+
+      setTimeout(() => {
+        taskText.textContent = tasks[index];
+        spinning = false;
+        spinBtn.disabled = false;
+      }, 4000);
+    }
+
+    function addTask() {
+      const text = newTaskInput.value.trim();
+      if (!text) return;
+      tasks.push(text);
+      newTaskInput.value = "";
+      localStorage.setItem("britva_tasks", JSON.stringify(tasks));
+      // можно дать небольшой визуальный фидбэк
+      taskText.textContent = "Новое задание добавлено в барабан!";
+    }
+
+    spinBtn.addEventListener("click", spinWheel);
+    addTaskBtn.addEventListener("click", addTask);
+  </script>
+
+</body>
+</html>
